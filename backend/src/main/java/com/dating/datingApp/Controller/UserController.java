@@ -40,6 +40,29 @@ public class UserController {
         }
     }
 
+    public void checkAndUpdateMatch(Integer userId1, Integer userId2) {
+        Optional<Users> userOpt1 = userRepo.findById(userId1);
+        Optional<Users> userOpt2 = userRepo.findById(userId2);
+    
+        if (userOpt1.isPresent() && userOpt2.isPresent()) {
+            Users user1 = userOpt1.get();
+            Users user2 = userOpt2.get();
+    
+            // Si les deux se like encore → ajouter match
+            if (user1.getILikes().contains(userId2) && user2.getILikes().contains(userId1)) {
+                user1.getMatchs().add(userId2);
+                user2.getMatchs().add(userId1);
+            } else { // Sinon → retirer match
+                user1.getMatchs().remove(userId2);
+                user2.getMatchs().remove(userId1);
+            }
+    
+            userRepo.save(user1);
+            userRepo.save(user2);
+        }
+    }
+    
+
     public void checkAndAddMatch(Integer userId1, Integer userId2) {
         if (userId1 == null || userId2 == null) {
             throw new IllegalArgumentException("Invalid input");
@@ -101,7 +124,11 @@ public class UserController {
         Integer idLiked = reqBody.get("idLiked");
         Integer idLiker = reqBody.get("idLiker");
 
-        checkAndAddMatch(idLiked, idLiker);
+        checkAndUpdateMatch(idLiker, idLiked);
+
+        // checkAndUpdateMatch(idLiker, idLiked);
+
+        // checkAndAddMatch(idLiked, idLiker);
 
         if (idLiked == null || idLiker == null) {
             return ResponseEntity.badRequest().body("Invalid input");
@@ -172,8 +199,8 @@ public class UserController {
     public ResponseEntity<String> addHate(@RequestBody Map<String, Integer> reqBody) {
         Integer hatedId = reqBody.get("hatedId");
         Integer haterId = reqBody.get("haterId");
-
-        checkAndAddMatch(hatedId, hatedId);
+        checkAndUpdateMatch(haterId, hatedId);
+        // checkAndAddMatch(hatedId, hatedId);
 
         if (hatedId == null || haterId == null) {
             return ResponseEntity.badRequest().body("Invalid input");
@@ -241,3 +268,4 @@ public class UserController {
     }
 
 }
+

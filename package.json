@@ -20,6 +20,7 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-router-dom": "^7.1.5",
+    "react-slick": "^0.31.0",
     "react-stomp": "^5.1.0",
     "sockjs": "^0.3.24",
     "sockjs-client": "^1.6.1",
