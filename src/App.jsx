@@ -16,6 +16,8 @@ import { Admin0, Admin1 } from "./pages/adminPanel"
 import MatchesPage from "./section/MatchesPage"
 import LikesPage from "./section/LikesPage"
 import MessagePage from "./section/MessagePage"
+import SettingPage from "./pages/Setting"
+
 
 const router = createBrowserRouter([
   {
@@ -49,8 +51,7 @@ const router = createBrowserRouter([
   // { path: "/visitors", element: <VisitorPage /> },
   { path: "/likes", element: <LikesPage /> },
   { path: "/message", element: <MessagePage /> },
-  // { path: "/ihates", element: <IHatePage /> },
-  // { path: "/settings", element: <SettingPage /> },
+  { path: "/settings", element: <SettingPage /> },
 ])
 
 const App = () => {

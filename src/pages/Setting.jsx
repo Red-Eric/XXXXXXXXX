@@ -104,7 +104,7 @@ const SettingPage = () => {
         if (validate) {
             //    /update/user
             axios.post("http://localhost:8080/api/user/update", { // /api/user/update 
-                id : parseInt(sessionStorage.getItem("id")),
+                id: parseInt(sessionStorage.getItem("id")),
                 age: age_,
                 bio: bio_,
                 tel: `+ 261 ${tel}`,
@@ -118,9 +118,9 @@ const SettingPage = () => {
                 sexe: isMale ? "H" : "F"
             }).then(res => {
                 Swal.fire({
-                    title : "Modifier",
-                    text : "modification avec succes",
-                    icon : "success"
+                    title: "Modifier",
+                    text: "modification avec succes",
+                    icon: "success"
                 })
                 window.location.reload()
             })
@@ -188,17 +188,17 @@ const SettingPage = () => {
     return (
         <div>
 
-            <div className="w-[40%] bg-gray-700 mt-6 ml-auto mr-auto rounded-3xl pb-3 max-h-[620px] overflow-y-scroll custom-scrollbar">
-                <h1 className="font-medium text-center text-white text-4xl mb-8">Modification</h1>
-                <img id="pfp" onClick={changePfp} ref={pfpRef} className="cursor-pointer w-32 h-32 rounded-full ml-auto mr-auto mb-2" src={pfp} alt="pfp" />
+            <div className="w-[40%] bg-white mt-6 ml-auto mr-auto rounded-3xl pb-3 max-h-[620px] overflow-y-scroll custom-scrollbar">
+                <h1 className="font-medium text-center text-pink-500 text-4xl mb-8">Modification</h1>
+                <img id="pfp" onClick={changePfp} ref={pfpRef} className="cursor-pointer w-32 h-32 rounded-full ml-auto mr-auto mb-2 border-2 border-pink-500" src={pfp} alt="pfp" />
                 <Link to={"/"} ref={ret}></Link>
                 <div className="ml-auto mr-auto w-[75%] mb-5 flex justify-between gap-4">
                     <div>
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                             Nom
                         </label>
                         <input
-                            className="w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="text"
                             placeholder="Nom..."
                             onChange={handleChangeName}
@@ -207,12 +207,12 @@ const SettingPage = () => {
                         />
                     </div>
                     <div>
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                             Prenom
                         </label>
                         <input
                             defaultValue={userDef?.fname}
-                            className="w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="text"
                             placeholder="Prenom..."
                             autoComplete="off"
@@ -221,12 +221,12 @@ const SettingPage = () => {
                         />
                     </div>
                     <div className="w-[15%]">
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                             Age
                         </label>
                         <input
                             defaultValue={userDef?.age}
-                            className="w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="text"
                             placeholder="Age"
                             autoComplete="off"
@@ -240,11 +240,11 @@ const SettingPage = () => {
                 <div className="ml-auto mr-auto w-[75%] mb-5 flex justify-between gap-4">
 
                     <div className="w-[60%]">
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                             De
                         </label>
                         <input
-                            className="w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="text"
                             placeholder="Votre Habitation"
                             autoComplete="off"
@@ -255,11 +255,11 @@ const SettingPage = () => {
                     </div>
 
                     <div className="w-[35%]">
-                        <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                        <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                             Tel
                         </label>
                         <input
-                            className="w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="text"
                             placeholder="Votre Numero"
                             autoComplete="off"
@@ -276,33 +276,33 @@ const SettingPage = () => {
                             <Checkbox
                                 checked={isMale}
                                 onChange={handleSex}
-                                sx={{ color: "blue", '&.Mui-checked': { color: "blue" } }}
+                                sx={{ color: "pink", '&.Mui-checked': { color: "pink" } }}
                             />
                         }
                         label="Je suis un Homme"
-                        sx={{ color: "white" }}
+                        sx={{ color: "pink" }}
                     />
                     <FormControlLabel
                         control={
                             <Checkbox
                                 checked={!isMale}
                                 onChange={handleSex}
-                                sx={{ color: "pink", '&.Mui-checked': { color: "#FF1493" } }}
+                                sx={{ color: "pink", '&.Mui-checked': { color: "pink" } }}
                             />
                         }
                         label="Je suis une Femme"
-                        sx={{ color: "white" }}
+                        sx={{ color: "pink" }}
                     />
                 </div>
 
                 <div className="ml-auto mr-auto w-[75%] mb-5">
-                    <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                    <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                         Email
                     </label>
 
                     <div className="flex items-center gap-2">
                         <input
-                            className="w-[60%] shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-[60%] shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="email"
                             placeholder="Votre Email"
                             required={true}
@@ -310,18 +310,18 @@ const SettingPage = () => {
                             onChange={handleChangeEmail}
                             id="email"
                         />
-                        <p className="block text-white text-sm font-extralight mb-2">@gmail.com</p>
+                        <p className="block text-pink-500 text-sm font-extralight mb-2">@gmail.com</p>
                     </div>
                 </div>
 
                 <div className="ml-auto mr-auto w-[75%] mb-5">
-                    <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                    <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                         Mots de passes
                     </label>
 
                     <div className="flex items-center gap-2">
                         <input
-                            className="w-[60%] shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline"
+                            className="w-[60%] shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white"
                             type="password"
                             placeholder="Votre mots de passe"
                             autoComplete="off"
@@ -332,13 +332,12 @@ const SettingPage = () => {
                 </div>
 
                 <div className="ml-auto mr-auto w-[75%] mb-5">
-
-                    <label htmlFor="message" className="block text-white text-sm font-bold mb-2">Bio ({max})</label>
-                    <textarea defaultValue={userDef?.bio} id="bio" maxLength={90} autoComplete="off" onChange={handleBio} rows="3" className="resize-none w-full shadow appearance-none border text-white rounded py-2 px-3  leading-tight focus:outline-none focus:shadow-outline" placeholder="Write your thoughts here..."></textarea>
+                    <label htmlFor="message" className="block text-pink-500 text-sm font-bold mb-2">Bio ({max})</label>
+                    <textarea defaultValue={userDef?.bio} id="bio" maxLength={90} autoComplete="off" onChange={handleBio} rows="3" className="resize-none w-full shadow appearance-none border border-pink-500 text-pink-500 rounded py-2 px-3 leading-tight focus:outline-none focus:shadow-outline bg-white" placeholder="Write your thoughts here..."></textarea>
                 </div>
 
                 <div className="ml-auto mr-auto w-[75%] mb-5 ">
-                    <label className="block text-white text-sm font-bold mb-2" htmlFor="username">
+                    <label className="block text-pink-500 text-sm font-bold mb-2" htmlFor="username">
                         Centre d'intérêt(s)
                     </label>
                     <div className="flex flex-wrap gap-3">
@@ -347,7 +346,7 @@ const SettingPage = () => {
                                 <input type="checkbox" onChange={handleSelectionH} datah="check" id={`checkbox-${value}`} value={value} className="hidden peer" />
                                 <label
                                     htmlFor={`checkbox-${value}`}
-                                    className="inline-flex items-center justify-between w-full p-1 text-white bg-gray-800 border-2 border-gray-200 rounded-lg cursor-pointer hover:text-black hover:bg-gray-50 peer-checked:border-blue-600 peer-checked:text-black"
+                                    className="inline-flex items-center justify-between w-full p-1 text-pink-500 bg-white border-2 border-pink-500 rounded-lg cursor-pointer hover:text-white hover:bg-pink-500 peer-checked:border-pink-500 peer-checked:text-white"
                                 >
                                     <h1 id={`hobbies-${index}`}>{value}</h1>
                                 </label>
@@ -357,7 +356,7 @@ const SettingPage = () => {
                 </div>
                 <div className="flex justify-center">
                     <button
-                        className="bg-pink-500 hover:bg-pink-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-auto mr-auto"
+                        className="bg-pink-500 hover:bg-white text-white hover:text-pink-500 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-auto mr-auto"
                         type="button"
                         onClick={GetInfo}
                     >
@@ -367,6 +366,8 @@ const SettingPage = () => {
 
             </div>
         </div>
+
+
     )
 }
 
