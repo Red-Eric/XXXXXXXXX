@@ -44,3 +44,12 @@ const App = ()=>{
 }
 
 export default App
+
+
+// pages/
+// ├─ MatchesPage.jsx
+// ├─ VisitorPage.jsx
+// ├─ LikesPage.jsx
+// ├─ ILikePage.jsx
+// ├─ IhatePage.jsx
+// ├─ SettingPage.jsx

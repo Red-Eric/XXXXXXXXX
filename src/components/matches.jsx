@@ -1,28 +1,3 @@
-// import { useEffect, useState } from "react"
-// import { getUserFromId } from "../func/getAllUser"
-
-// const MatchesPage = ()=>{
-
-//     const [MatchesList, setMatchesList] = useState([])
-
-//     useEffect(()=>{
-//         getUserFromId(parseInt(sessionStorage.getItem("id")))
-//         .then(data => setMatchesList(data.matchs))
-//     },[])
-    
-
-//     return (
-//         <div className="mt-64 flex justify-center items-center">
-//             {
-//                 MatchesList.length > 0 ? <h1>oui</h1> : <h1 className="font-medium text-2xl">Vous avez 0 matche(s)</h1>
-//             }
-//         </div>
-//     )
-// }
-
-// export default MatchesPage
-
-
 import { useEffect, useState } from "react"
 import { getUsersWithoutId, getUserFromId, GetAllUser } from "../func/getAllUser"
 import ProfileCard2 from "./ProfileCard2";
