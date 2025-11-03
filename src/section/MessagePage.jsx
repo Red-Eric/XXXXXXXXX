@@ -10,29 +10,52 @@ const MessagePage = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const messagesEndRef = useRef();
-  const [unreadCounts, setUnreadCounts] = useState({}); // {matchId: count}
+  const [unreadCounts, setUnreadCounts] = useState({});
 
-  // Récupérer les matches et calculer les messages non lus
+  const getConversationId = (id1, id2) => (id1 < id2 ? `${id1}and${id2}` : `${id2}and${id1}`);
+
+  const parseMessages = (items) => {
+    if (!items || !items.length) return [];
+    return items.map(item => {
+      const parts = item.split(" ");
+      const timestamp = Number(parts[0]);
+      const senderId = Number(parts[1]);
+      const fromMe = senderId === currentUserId;
+      const read = parts[3] === "read_true";
+      const text = parts.slice(4).join(" ");
+      return { timestamp, fromMe, read, text };
+    }).sort((a, b) => a.timestamp - b.timestamp); // tri du plus ancien au plus récent
+  };
+
+  // Récupérer matches et unread counts
   useEffect(() => {
     const fetchMatches = async () => {
       const allUsers = await GetAllUser();
       const currentUser = allUsers.find(u => u.id === currentUserId);
       if (!currentUser) return;
+
       const matchesFiltered = allUsers.filter(u => currentUser.matchs?.includes(u.id));
       setMatches(matchesFiltered);
 
       const counts = {};
       for (const m of matchesFiltered) {
         const convId = getConversationId(currentUserId, m.id);
-        const res = await fetch(`http://localhost:8080/api/message/${convId}`);
-        if (res.ok) {
-          const data = await res.json();
-          const parsed = parseMessages(Array.from(data.items));
-          counts[m.id] = parsed.filter(msg => !msg.fromMe && !msg.read).length;
-        } else {
+        let res = await fetch(`http://localhost:8080/api/message/${convId}`);
+        if (!res.ok) {
+          // Créer conversation si inexistante
+          await fetch("http://localhost:8080/api/message", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ id: convId, items: [] }),
+          });
           counts[m.id] = 0;
+          continue;
         }
+        const data = await res.json();
+        const parsed = parseMessages(Array.from(data.items));
+        counts[m.id] = parsed.filter(msg => !msg.fromMe && !msg.read).length;
       }
+      console.log(counts)
       setUnreadCounts(counts);
     };
     fetchMatches();
@@ -46,32 +69,25 @@ const MessagePage = () => {
     `${m.name} ${m.fname}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getConversationId = (id1, id2) => id1 < id2 ? `${id1}and${id2}` : `${id2}and${id1}`;
-
-  const parseMessages = (items) => {
-    if (!items || !items.length) return [];
-    return items.map(item => {
-      // Nouveau format: "timestamp senderId true read_true texte"
-      const parts = item.split(" ");
-      const timestamp = Number(parts[0]);
-      const senderId = Number(parts[1]);
-      const fromMe = senderId === currentUserId;
-      const read = parts[3] === "read_true";
-      const text = parts.slice(4).join(" ");
-
-      return { timestamp, fromMe, read, text };
-    });
-  };
-
   const loadMessages = async (match) => {
     setSelectedMatch(match);
     const convId = getConversationId(currentUserId, match.id);
-    const res = await fetch(`http://localhost:8080/api/message/${convId}`);
-    if (!res.ok) return setMessages([]);
-    const data = await res.json();
-    setMessages(parseMessages(Array.from(data.items)));
 
-    // mettre à jour les messages non lus pour ce match
+    let res = await fetch(`http://localhost:8080/api/message/${convId}`);
+    if (!res.ok) {
+      // Créer si pas existant
+      await fetch("http://localhost:8080/api/message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: convId, items: [] }),
+      });
+      setMessages([]);
+      setUnreadCounts(prev => ({ ...prev, [match.id]: 0 }));
+      return;
+    }
+    const data = await res.json();
+    const parsed = parseMessages(Array.from(data.items));
+    setMessages(parsed);
     setUnreadCounts(prev => ({ ...prev, [match.id]: 0 }));
   };
 
@@ -88,7 +104,7 @@ const MessagePage = () => {
     await fetch("http://localhost:8080/api/message/add", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ id: convId, mess: msgStr })
+      body: JSON.stringify({ id: convId, mess: msgStr }),
     });
   };
 
