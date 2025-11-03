@@ -55,7 +55,7 @@ const MessagePage = () => {
         const parsed = parseMessages(Array.from(data.items));
         counts[m.id] = parsed.filter(msg => !msg.fromMe && !msg.read).length;
       }
-      console.log(counts)
+      // console.log(counts)
       setUnreadCounts(counts);
     };
     fetchMatches();
@@ -96,7 +96,7 @@ const MessagePage = () => {
 
     const convId = getConversationId(currentUserId, selectedMatch.id);
     const timestamp = Date.now();
-    const msgStr = `${timestamp} ${currentUserId} true read_true ${newMessage}`;
+    const msgStr = `${timestamp} ${currentUserId} true read_false ${newMessage}`;
 
     setMessages(prev => [...prev, { timestamp, fromMe: true, read: true, text: newMessage }]);
     setNewMessage("");
