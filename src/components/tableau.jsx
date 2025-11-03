@@ -61,7 +61,7 @@ export const Tableau = () => {
                                     <th scope="col" className="p-5 text-center text-sm font-semibold text-gray-900 capitalize rounded-t-xl">Email</th>
                                     <th scope="col" className="p-5 text-center text-sm font-semibold text-gray-900 capitalize rounded-t-xl">Localisation</th>
                                     <th scope="col" className="p-5 text-center text-sm font-semibold text-gray-900 capitalize">Telephone</th>
-                                    <th scope="col" className="p-5 text-center text-sm font-semibold text-gray-900 capitalize">Action</th>
+                                    {/* <th scope="col" className="p-5 text-center text-sm font-semibold text-gray-900 capitalize">Action</th> */}
                                 </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-300">
@@ -80,9 +80,10 @@ export const Tableau = () => {
                                             <td className="p-5 text-center text-sm font-medium text-gray-900">{e.place}</td>
                                             <td className="p-5 text-center text-sm font-medium text-gray-900">{e.tel}</td>
                                             <td className="p-5 text-center text-sm font-medium text-gray-900">
-                                                <h2 className="text-white bg-red-500 text-center p-3 rounded-2xl duration-500 hover:bg-red-700 cursor-pointer" onClick={()=>{
+                                                {/* <h2 className="text-white bg-red-500 text-center p-3 rounded-2xl duration-500 hover:bg-red-700 cursor-pointer" onClick={()=>{
                                                     console.log(e.id)
-                                                }}>Effacer</h2>
+                                                    axios.post("http://localhost:8080/api/user")
+                                                }}>Effacer</h2> */}
                                             </td>
                                         </tr>
                                     ))
