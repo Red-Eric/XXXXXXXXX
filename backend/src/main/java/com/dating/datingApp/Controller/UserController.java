@@ -43,11 +43,11 @@ public class UserController {
     public void checkAndUpdateMatch(Integer userId1, Integer userId2) {
         Optional<Users> userOpt1 = userRepo.findById(userId1);
         Optional<Users> userOpt2 = userRepo.findById(userId2);
-    
+
         if (userOpt1.isPresent() && userOpt2.isPresent()) {
             Users user1 = userOpt1.get();
             Users user2 = userOpt2.get();
-    
+
             // Si les deux se like encore → ajouter match
             if (user1.getILikes().contains(userId2) && user2.getILikes().contains(userId1)) {
                 user1.getMatchs().add(userId2);
@@ -56,12 +56,11 @@ public class UserController {
                 user1.getMatchs().remove(userId2);
                 user2.getMatchs().remove(userId1);
             }
-    
+
             userRepo.save(user1);
             userRepo.save(user2);
         }
     }
-    
 
     public void checkAndAddMatch(Integer userId1, Integer userId2) {
         if (userId1 == null || userId2 == null) {
@@ -148,6 +147,34 @@ public class UserController {
             userRepo.save(likedUser);
             return ResponseEntity.ok("Liked");
         }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
+    }
+
+    @PostMapping("/unlike")
+    public ResponseEntity<String> removeLike(@RequestBody Map<String, Integer> reqBody) {
+        Integer idLiked = reqBody.get("idLiked");
+        Integer idLiker = reqBody.get("idLiker");
+
+        if (idLiked == null || idLiker == null) {
+            return ResponseEntity.badRequest().body("Invalid input");
+        }
+
+        Optional<Users> likedOpt = userRepo.findById(idLiked);
+        Optional<Users> likerOpt = userRepo.findById(idLiker);
+
+        if (likedOpt.isPresent() && likerOpt.isPresent()) {
+            Users likedUser = likedOpt.get();
+            Users likerUser = likerOpt.get();
+
+            // Supprime le like
+            likerUser.getILikes().remove(idLiked);
+            likedUser.getLikes().remove(idLiker);
+
+            userRepo.save(likerUser);
+            userRepo.save(likedUser);
+            return ResponseEntity.ok("Unliked");
+        }
+
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
 
@@ -266,7 +293,5 @@ public class UserController {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
     }
-    
 
 }
-

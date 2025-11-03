@@ -1,8 +1,50 @@
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const goBack = () => navigate(-1);
+  const currentUserId = parseInt(sessionStorage.getItem("id"));
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    if (user?.id) {
+      // Vérifie si l'utilisateur connecté a déjà liké ce profil
+      setLiked(user?.likes?.includes(currentUserId));
+    }
+  }, [user, currentUserId]);
+
+  const handleLike = async () => {
+    try {
+      if (!liked) {
+        // Like
+        await axios.post("http://localhost:8080/api/user/likes", {
+          idLiked: user.id,
+          idLiker: currentUserId,
+        });
+
+        // Notification
+        const currentUserName = sessionStorage.getItem("name") || "";
+        const currentUserFname = sessionStorage.getItem("fname") || "";
+        await axios.post("http://localhost:8080/api/user/notify", {
+          idNotified: user.id,
+          notif: `${currentUserName} ${currentUserFname} vous a aimé`,
+        });
+
+        setLiked(true);
+      } else {
+        // Unlike
+        await axios.post("http://localhost:8080/api/user/unlike", {
+          idLiked: user.id,
+          idLiker: currentUserId,
+        });
+        setLiked(false);
+      }
+    } catch (err) {
+      console.error("Erreur lors du like/unlike :", err);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-16 px-4">
@@ -10,17 +52,39 @@ const Profile = ({ user }) => {
         <div className="flex flex-col md:flex-row">
           {/* Image + Infos rapides */}
           <div className="md:w-1/3 flex flex-col items-center justify-center bg-gradient-to-b from-pink-600 to-pink-900 p-6">
-            <img
-              src={user?.image}
-              alt="Profile"
-              className="rounded-full w-40 h-40 object-cover border-4 border-white shadow-md mb-4 transition-transform duration-300 hover:scale-105"
-            />
-            <h1 className="text-2xl font-bold text-white">
-              {user?.name} {user?.fname}
-            </h1>
-            <p className="text-pink-200 mt-1">
-              {user?.sexe === "H" ? "Homme" : "Femme"}
-            </p>
+            <div className="relative">
+              <img
+                src={user?.image}
+                alt="Profile"
+                className="rounded-full w-40 h-40 object-cover border-4 border-white shadow-md mb-4 transition-transform duration-300 hover:scale-105"
+              />
+              {/* Cœur Like */}
+              <button
+                onClick={handleLike}
+                className={`absolute bottom-0 right-0 w-10 h-10 flex items-center justify-center rounded-full shadow-lg transition-all
+                  ${liked
+                    ? "bg-pink-600 text-white"
+                    : "bg-white text-pink-600 border border-pink-600 hover:bg-pink-50 hover:text-pink-700"
+                  } hover:scale-110`}
+              >
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill={liked ? "currentColor" : "none"}
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2"
+                    d="M4.318 6.318a4.5 4.5 0 016.364 0L12 7.636l1.318-1.318a4.5 4.5 0 116.364 6.364L12 21.682l-7.682-7.682a4.5 4.5 0 010-6.364z"
+                  />
+                </svg>
+              </button>
+            </div>
+            <h1 className="text-2xl font-bold text-white">{user?.name} {user?.fname}</h1>
+            <p className="text-pink-200 mt-1">{user?.sexe === "H" ? "Homme" : "Femme"}</p>
             <button
               onClick={goBack}
               className="mt-6 bg-white text-pink-900 font-semibold px-4 py-2 rounded-lg hover:bg-pink-100 transition"
@@ -39,9 +103,7 @@ const Profile = ({ user }) => {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-xl font-semibold text-pink-800 mb-3">
-                Centres d'intérêt
-              </h2>
+              <h2 className="text-xl font-semibold text-pink-800 mb-3">Centres d'intérêt</h2>
               <div className="flex flex-wrap gap-2">
                 {user?.hobby?.length > 0 ? (
                   user.hobby.map((e) => (
@@ -59,9 +121,7 @@ const Profile = ({ user }) => {
             </section>
 
             <section>
-              <h2 className="text-xl font-semibold text-pink-800 mb-3">
-                Informations de contact
-              </h2>
+              <h2 className="text-xl font-semibold text-pink-800 mb-3">Informations de contact</h2>
               <ul className="space-y-3 text-pink-900">
                 <li className="flex items-center">
                   <svg
