@@ -52,7 +52,7 @@ public class UserController {
             if (user1.getILikes().contains(userId2) && user2.getILikes().contains(userId1)) {
                 user1.getMatchs().add(userId2);
                 user2.getMatchs().add(userId1);
-            } else { // Sinon → retirer match
+            } else { // 
                 user1.getMatchs().remove(userId2);
                 user2.getMatchs().remove(userId1);
             }
