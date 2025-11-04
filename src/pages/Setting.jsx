@@ -8,6 +8,7 @@ import Swal from "sweetalert2"
 import { getFile } from "../func/pickerF"
 import "./SignIn.css"
 import axios from "axios"
+import NavBarLogged from "../components/NavBarLogged"
 
 const PATH_IMAGE = "/src/images/"
 // 
@@ -187,7 +188,7 @@ const SettingPage = () => {
 
     return (
         <div>
-
+            <NavBarLogged/>
             <div className="w-[40%] bg-white mt-6 ml-auto mr-auto rounded-3xl pb-3 max-h-[620px] overflow-y-scroll custom-scrollbar">
                 <h1 className="font-medium text-center text-pink-500 text-4xl mb-8">Modification</h1>
                 <img id="pfp" onClick={changePfp} ref={pfpRef} className="cursor-pointer w-32 h-32 rounded-full ml-auto mr-auto mb-2 border-2 border-pink-500" src={pfp} alt="pfp" />
@@ -360,7 +361,7 @@ const SettingPage = () => {
                         type="button"
                         onClick={GetInfo}
                     >
-                        S'inscrire
+                        Modifier
                     </button>
                 </div>
 

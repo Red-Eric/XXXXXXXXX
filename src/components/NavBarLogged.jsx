@@ -18,25 +18,47 @@ const NavBarLogged = () => {
 
   const userId = parseInt(sessionStorage.getItem("id"));
 
+  // useEffect(() => {
+  //   getUserFromId(userId).then((data) => {
+  //     setNotifNumber(data?.notif.length || 0);
+  //     setNotifications(data?.notif || []);
+  //     setProfilePic(data?.image || "");
+  //   });
+
+  //   const handleClickOutside = (e) => {
+  //     if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false);
+  //     if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotif(false);
+  //   };
+  //   document.addEventListener("mousedown", handleClickOutside);
+  //   return () => document.removeEventListener("mousedown", handleClickOutside);
+  // });
+
+
   useEffect(() => {
-    getUserFromId(userId).then((data) => {
+    const fetchUserData = async () => {
+      const data = await getUserFromId(userId);
       setNotifNumber(data?.notif.length || 0);
       setNotifications(data?.notif || []);
       setProfilePic(data?.image || "");
-    });
+    };
 
-    // Fermer menus si clic à l'extérieur
+    fetchUserData(); // première exécution immédiate
+
+    // boucle toutes les 200 ms
+    const interval = setInterval(fetchUserData, 200);
+
     const handleClickOutside = (e) => {
-      if (menuRef.current && !menuRef.current.contains(e.target)) {
-        setShowMenu(false);
-      }
-      if (notifRef.current && !notifRef.current.contains(e.target)) {
-        setShowNotif(false);
-      }
+      if (menuRef.current && !menuRef.current.contains(e.target)) setShowMenu(false);
+      if (notifRef.current && !notifRef.current.contains(e.target)) setShowNotif(false);
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [userId]);
+
 
   const goTo = (path) => navigate(path);
 
@@ -59,7 +81,6 @@ const NavBarLogged = () => {
   return (
     <header className="bg-white shadow-md border-b border-pink-200 sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-10 flex justify-between items-center h-16">
-        {/* Logo + Recherche */}
         <div className="flex items-center gap-6">
           <button
             onClick={() => goTo("/feed")}
@@ -73,7 +94,6 @@ const NavBarLogged = () => {
           </div>
         </div>
 
-        {/* Navigation principale */}
         <div className="flex items-center gap-6 relative">
           <button
             onClick={() => goTo("/matches")}
@@ -91,7 +111,6 @@ const NavBarLogged = () => {
             <span>J’aimes</span>
           </button>
 
-          {/* Notifications */}
           <div className="relative" ref={notifRef}>
             <Bell
               className="h-5 w-5 text-pink-600 hover:text-pink-700 cursor-pointer"
@@ -127,9 +146,11 @@ const NavBarLogged = () => {
             )}
           </div>
 
-          <MessageCircle className="h-5 w-5 text-pink-600 hover:text-pink-700" onClick={()=> navigate("/message")}/>
+          <MessageCircle
+            className="h-5 w-5 text-pink-600 hover:text-pink-700"
+            onClick={() => navigate("/message")}
+          />
 
-          {/* Photo de profil + menu */}
           <div className="relative" ref={menuRef}>
             <img
               src={profilePic || "/default-avatar.png"}
@@ -140,14 +161,20 @@ const NavBarLogged = () => {
             {showMenu && (
               <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg py-2 z-50">
                 <button
-                  onClick={() => { goTo(`/profile/${userId}`); setShowMenu(false); }}
+                  onClick={() => {
+                    goTo(`/profile/${userId}`);
+                    setShowMenu(false);
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-pink-50 flex items-center gap-2"
                 >
                   <Users className="h-4 w-4 text-pink-600" />
                   Mon profil
                 </button>
                 <button
-                  onClick={() => { goTo("/settings"); setShowMenu(false); }}
+                  onClick={() => {
+                    goTo("/settings");
+                    setShowMenu(false);
+                  }}
                   className="w-full text-left px-4 py-2 hover:bg-pink-50 flex items-center gap-2"
                 >
                   <Settings className="h-4 w-4 text-pink-600" />

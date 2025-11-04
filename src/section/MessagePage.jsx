@@ -16,33 +16,35 @@ const MessagePage = () => {
 
   const parseMessages = (items) => {
     if (!items || !items.length) return [];
-    return items.map(item => {
-      const parts = item.split(" ");
-      const timestamp = Number(parts[0]);
-      const senderId = Number(parts[1]);
-      const fromMe = senderId === currentUserId;
-      const read = parts[3] === "read_true";
-      const text = parts.slice(4).join(" ");
-      return { timestamp, fromMe, read, text };
-    }).sort((a, b) => a.timestamp - b.timestamp); // tri du plus ancien au plus récent
+    return items
+      .map((item) => {
+        const parts = item.split(" ");
+        const timestamp = Number(parts[0]);
+        const senderId = Number(parts[1]);
+        const fromMe = senderId === currentUserId;
+        const read = parts[3] === "read_true";
+        const text = parts.slice(4).join(" ");
+        return { timestamp, fromMe, read, text };
+      })
+      .sort((a, b) => a.timestamp - b.timestamp);
   };
 
-  // Récupérer matches et unread counts
   useEffect(() => {
     const fetchMatches = async () => {
       const allUsers = await GetAllUser();
-      const currentUser = allUsers.find(u => u.id === currentUserId);
+      const currentUser = allUsers.find((u) => u.id === currentUserId);
       if (!currentUser) return;
-
-      const matchesFiltered = allUsers.filter(u => currentUser.matchs?.includes(u.id));
+  
+      const matchesFiltered = allUsers.filter((u) =>
+        currentUser.matchs?.includes(u.id)
+      );
       setMatches(matchesFiltered);
-
+  
       const counts = {};
       for (const m of matchesFiltered) {
         const convId = getConversationId(currentUserId, m.id);
         let res = await fetch(`http://localhost:8080/api/message/${convId}`);
         if (!res.ok) {
-          // Créer conversation si inexistante
           await fetch("http://localhost:8080/api/message", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -53,19 +55,76 @@ const MessagePage = () => {
         }
         const data = await res.json();
         const parsed = parseMessages(Array.from(data.items));
-        counts[m.id] = parsed.filter(msg => !msg.fromMe && !msg.read).length;
+        counts[m.id] = parsed.filter((msg) => !msg.fromMe && !msg.read).length;
       }
-      // console.log(counts)
       setUnreadCounts(counts);
+  
+      if (selectedMatch) {
+        const convId = getConversationId(currentUserId, selectedMatch.id);
+        const res = await fetch(`http://localhost:8080/api/message/${convId}`);
+        if (res.ok) {
+          const data = await res.json();
+          const parsed = parseMessages(Array.from(data.items));
+          setMessages(parsed);
+        }
+      }
     };
-    fetchMatches();
-  }, [currentUserId]);
+  
+    // interval de 200 ms
+    const interval = setInterval(fetchMatches, 200);
+    return () => clearInterval(interval);
+  }, [currentUserId, selectedMatch]);
+  
+
+  // boucle infinie pour re-render et maj continue du chat et des matches
+  // useEffect(() => {
+  //   const fetchMatches = async () => {
+  //     const allUsers = await GetAllUser();
+  //     const currentUser = allUsers.find((u) => u.id === currentUserId);
+  //     if (!currentUser) return;
+
+  //     const matchesFiltered = allUsers.filter((u) => currentUser.matchs?.includes(u.id));
+  //     setMatches(matchesFiltered);
+
+  //     const counts = {};
+  //     for (const m of matchesFiltered) {
+  //       const convId = getConversationId(currentUserId, m.id);
+  //       let res = await fetch(`http://localhost:8080/api/message/${convId}`);
+  //       if (!res.ok) {
+  //         await fetch("http://localhost:8080/api/message", {
+  //           method: "POST",
+  //           headers: { "Content-Type": "application/json" },
+  //           body: JSON.stringify({ id: convId, items: [] }),
+  //         });
+  //         counts[m.id] = 0;
+  //         continue;
+  //       }
+  //       const data = await res.json();
+  //       const parsed = parseMessages(Array.from(data.items));
+  //       counts[m.id] = parsed.filter((msg) => !msg.fromMe && !msg.read).length;
+  //     }
+  //     setUnreadCounts(counts);
+
+  //     // si un chat est sélectionné, on recharge les messages aussi
+  //     if (selectedMatch) {
+  //       const convId = getConversationId(currentUserId, selectedMatch.id);
+  //       const res = await fetch(`http://localhost:8080/api/message/${convId}`);
+  //       if (res.ok) {
+  //         const data = await res.json();
+  //         const parsed = parseMessages(Array.from(data.items));
+  //         setMessages(parsed);
+  //       }
+  //     }
+  //   };
+
+  //   fetchMatches();
+  // }); // sans [] pour loop infinie
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    // messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const filteredMatches = matches.filter(m =>
+  const filteredMatches = matches.filter((m) =>
     `${m.name} ${m.fname}`.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -75,20 +134,19 @@ const MessagePage = () => {
 
     let res = await fetch(`http://localhost:8080/api/message/${convId}`);
     if (!res.ok) {
-      // Créer si pas existant
       await fetch("http://localhost:8080/api/message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: convId, items: [] }),
       });
       setMessages([]);
-      setUnreadCounts(prev => ({ ...prev, [match.id]: 0 }));
+      setUnreadCounts((prev) => ({ ...prev, [match.id]: 0 }));
       return;
     }
     const data = await res.json();
     const parsed = parseMessages(Array.from(data.items));
     setMessages(parsed);
-    setUnreadCounts(prev => ({ ...prev, [match.id]: 0 }));
+    setUnreadCounts((prev) => ({ ...prev, [match.id]: 0 }));
   };
 
   const handleSendMessage = async () => {
@@ -98,7 +156,7 @@ const MessagePage = () => {
     const timestamp = Date.now();
     const msgStr = `${timestamp} ${currentUserId} true read_false ${newMessage}`;
 
-    setMessages(prev => [...prev, { timestamp, fromMe: true, read: true, text: newMessage }]);
+    setMessages((prev) => [...prev, { timestamp, fromMe: true, read: true, text: newMessage }]);
     setNewMessage("");
 
     await fetch("http://localhost:8080/api/message/add", {
@@ -120,12 +178,12 @@ const MessagePage = () => {
               type="text"
               placeholder="Rechercher..."
               value={searchTerm}
-              onChange={e => setSearchTerm(e.target.value)}
+              onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full p-2 border rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
             />
           </div>
           <div className="flex-1 overflow-y-auto bg-gray-50">
-            {filteredMatches.map(m => {
+            {filteredMatches.map((m) => {
               const unread = unreadCounts[m.id] || 0;
               return (
                 <div
@@ -135,9 +193,15 @@ const MessagePage = () => {
                   onClick={() => loadMessages(m)}
                 >
                   <div className="flex items-center">
-                    <img src={m.image || "/default-avatar.png"} alt="avatar" className="w-12 h-12 rounded-full mr-3 border-2 border-pink-400" />
+                    <img
+                      src={m.image || "/default-avatar.png"}
+                      alt="avatar"
+                      className="w-12 h-12 rounded-full mr-3 border-2 border-pink-400"
+                    />
                     <div>
-                      <p className="font-semibold text-gray-700">{m.name} {m.fname}</p>
+                      <p className="font-semibold text-gray-700">
+                        {m.name} {m.fname}
+                      </p>
                     </div>
                   </div>
                   {unread > 0 && (
@@ -156,17 +220,28 @@ const MessagePage = () => {
           <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
             {selectedMatch ? (
               <>
-                <h2 className="text-xl font-bold mb-4 border-b border-gray-300 pb-2 text-pink-600">
-                  {selectedMatch.name} {selectedMatch.fname}
-                </h2>
+                <div className="flex items-center mb-4 border-b border-gray-300 pb-3">
+                  <img
+                    src={selectedMatch.image || "/default-avatar.png"}
+                    alt="avatar"
+                    className="w-12 h-12 rounded-full mr-3 border-2 border-pink-400"
+                  />
+                  <h2 className="text-xl font-bold text-pink-600">
+                    {selectedMatch.name} {selectedMatch.fname}
+                  </h2>
+                </div>
                 <div className="space-y-3">
                   {messages.map((m, idx) => (
                     <div
                       key={idx}
-                      className={`p-3 rounded-2xl max-w-xs shadow-md break-words ${m.fromMe ? "bg-pink-600 text-white ml-auto" : "bg-white text-gray-800 mr-auto"
+                      className={`p-3 rounded-2xl max-w-xs shadow-md break-words ${m.fromMe
+                          ? "bg-pink-600 text-white ml-auto"
+                          : "bg-white text-gray-800 mr-auto"
                         }`}
                     >
-                      <span className="text-xs text-gray-400 block mb-1">{new Date(m.timestamp).toLocaleTimeString()}</span>
+                      <span className="text-xs text-gray-400 block mb-1">
+                        {new Date(m.timestamp).toLocaleTimeString()}
+                      </span>
                       <p>{m.text}</p>
                     </div>
                   ))}
@@ -174,7 +249,9 @@ const MessagePage = () => {
                 </div>
               </>
             ) : (
-              <p className="text-gray-500 text-center mt-32">Sélectionnez un utilisateur pour discuter</p>
+              <p className="text-gray-500 text-center mt-32">
+                Sélectionnez un utilisateur pour discuter
+              </p>
             )}
           </div>
 
@@ -185,8 +262,8 @@ const MessagePage = () => {
                 placeholder="Tapez un message..."
                 className="flex-1 p-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-pink-500"
                 value={newMessage}
-                onChange={e => setNewMessage(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSendMessage()}
+                onChange={(e) => setNewMessage(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendMessage()}
               />
               <button
                 onClick={handleSendMessage}

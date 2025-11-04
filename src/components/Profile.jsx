@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
+import { getUserFromId } from "../func/getAllUser";
 
 const Profile = ({ user }) => {
   const navigate = useNavigate();
   const goBack = () => navigate(-1);
   const currentUserId = parseInt(sessionStorage.getItem("id"));
   const [liked, setLiked] = useState(false);
+  const [likedPpl, setLikedPpl] = useState([])
+  const { id } = useParams()
+  const [me, setMe] = useState(null)
 
   useEffect(() => {
     if (user?.id) {
@@ -29,7 +33,7 @@ const Profile = ({ user }) => {
         const currentUserFname = sessionStorage.getItem("fname") || "";
         await axios.post("http://localhost:8080/api/user/notify", {
           idNotified: user.id,
-          notif: `${currentUserName} ${currentUserFname} vous a aimé`,
+          notif: `${me.name} ${me.fname} vous a aimé`,
         });
 
         setLiked(true);
@@ -45,6 +49,22 @@ const Profile = ({ user }) => {
       console.error("Erreur lors du like/unlike :", err);
     }
   };
+
+
+  useEffect(() => {
+    getUserFromId(parseInt(sessionStorage.getItem("id"))).then(user => {
+      if (user) {
+        setMe(user)
+        console.log(user.ilikes)
+        if (user.ilikes.includes(3)) {
+          setLiked(true)
+        }
+        else{
+          setLiked(false)
+        }
+      }
+    })
+  }, [])
 
   return (
     <div className="min-h-screen bg-white flex items-center justify-center py-16 px-4">

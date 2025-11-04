@@ -3,22 +3,23 @@ import { useNavigate } from "react-router-dom";
 import NavBarLogged from "../components/NavBarLogged";
 import { getUserFromId, GetAllUser } from "../func/getAllUser";
 
-const GenericUserListPage = ({ listKey, title }) => {
-    const [usersList, setUsersList] = useState([]);
+const MatchesPage = () => {
+    const [matches, setMatches] = useState([]);
     const navigate = useNavigate();
     const currentUserId = parseInt(sessionStorage.getItem("id"));
 
     useEffect(() => {
-        const fetchUsers = async () => {
+        const fetchMatches = async () => {
             const user = await getUserFromId(currentUserId);
+            console.log(user)
             const allUsers = await GetAllUser();
-            if (user && user[listKey]) {
-                const filteredUsers = allUsers.filter(u => user[listKey].includes(u.id));
-                setUsersList(filteredUsers);
+            if (user?.matchs) {
+                const matchedUsers = allUsers.filter(u => user.likes.includes(u.id));
+                setMatches(matchedUsers);
             }
         };
-        fetchUsers();
-    }, [currentUserId, listKey]);
+        fetchMatches();
+    }, [currentUserId]);
 
     const goToProfile = (id) => {
         navigate(`/profile/${id}`);
@@ -29,11 +30,11 @@ const GenericUserListPage = ({ listKey, title }) => {
             <NavBarLogged />
 
             <div className="max-w-7xl mx-auto px-4 py-8">
-                <h1 className="text-2xl font-bold text-pink-600 mb-6">{title}</h1>
+                <h1 className="text-2xl font-bold text-pink-600 mb-6">Les personnes qui vous like</h1>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {usersList.length > 0 ? (
-                        usersList.map(user => (
+                    {matches.length > 0 ? (
+                        matches.map(user => (
                             <div
                                 key={user.id}
                                 onClick={() => goToProfile(user.id)}
@@ -70,7 +71,7 @@ const GenericUserListPage = ({ listKey, title }) => {
                         ))
                     ) : (
                         <p className="col-span-full text-center text-gray-500 mt-6">
-                            Aucun utilisateur pour le moment.
+                            Aucun match pour le moment.
                         </p>
                     )}
                 </div>
@@ -79,4 +80,4 @@ const GenericUserListPage = ({ listKey, title }) => {
     );
 };
 
-export default GenericUserListPage;
+export default MatchesPage;
